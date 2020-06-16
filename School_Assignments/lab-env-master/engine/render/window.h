@@ -59,6 +59,10 @@ public:
 	/// set optional nanovg render function
 	void SetNanoVGRender(const std::function<void(NVGcontext *)> & func);
 
+	float GetWindowWidth();
+
+	float GetWindowHeight();
+
 private:
 
 	/// static key press callback

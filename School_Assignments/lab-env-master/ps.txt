@@ -1,31 +1,36 @@
-#version 440
+#version 430
 layout(location=0) in vec2 UV;
-layout(location=1) in vec3 verticePos;
-layout(location=2) in vec4 lightningPosition;
-out vec3 Color;
-uniform sampler2D diffuseTex;
-uniform sampler2D normalTex;
-uniform sampler2D specTex;
-const vec3 ambientColor = vec3(0.1, 0.1, 0.1);
-const vec3 diffuseColor = vec3(0.4, 0.4, 0.4);
-const float shininess = 22.0;
-uniform float screenGamma = 2.2;
+layout(location=1) in vec3 norm;
+layout(location=2) in vec3 vertPos;
+
+layout(location=0) out vec3 Colour;
+layout(location=1) out vec4 specularColour;
+uniform sampler2D texSampler;
+
+uniform vec4 lightPos = vec4(0,0,0,0);
+uniform vec4 diffuseColour = vec4(0.0,0.0,0.0,0);
+uniform vec4 specColour = vec4(0.0,0.0,0.0,0);
+const float shininess = 16.0;
+const float screenGamma = 5.2;
+
 void main()
 {
-   vec3 specularColor = normalize(texture(specTex, UV).rgb);
-   vec3 normal = normalize(texture(normalTex, UV).rgb * 2.0 -1.0);
-   vec3 lightDir = normalize(vec3(lightningPosition) - verticePos);
-   float lambertian = max(dot(lightDir,normal), 0.0);
-   float specular = 0.0f;
-
-   if(lambertian > 0.0)
-   {
-       vec3 viewDir = normalize(-verticePos);
-       vec3 halfDir = normalize(lightDir + viewDir);
-       float specAngle = max(dot(halfDir, normal), 0.0);
-       specular = pow(specAngle, shininess);
-   }
-   vec3 colorLinear = ambientColor + lambertian * diffuseColor + specular * specularColor;
-   vec3 colorGammaCorrected = pow(colorLinear, vec3(1.0/screenGamma));
-   Color = texture(diffuseTex, UV).rgb * (ambientColor + lambertian) * specularColor;
-}
+	vec3 normal = normalize(norm);
+	vec3 lightDir = normalize(vec3(lightPos)-vertPos);
+	
+	float lambertian = max(dot(lightDir,normal),0.0);
+	float specular = 0.0;
+	
+	if(lambertian > 0.0)
+	{
+		vec3 viewDir = normalize(-vertPos);
+		
+		vec3 halfDir = normalize(lightDir+viewDir);
+		float specAngle = max(dot(halfDir, normal), 0.0);
+		specular = pow(specAngle, shininess);
+	}
+	vec3 colourLinear = lambertian*vec3(diffuseColour)+specular*vec3(specColour);
+	vec3 colourGammaCorrected = pow(colourLinear, vec3(1.0/screenGamma));
+	specularColour = vec4(colourGammaCorrected, 1.0);
+	Colour = (texture(texSampler,UV).rgb)*colourLinear;
+};

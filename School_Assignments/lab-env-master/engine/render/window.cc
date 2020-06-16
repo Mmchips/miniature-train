@@ -305,4 +305,14 @@ Window::SwapBuffers()
 	}
 }
 
+float Window::GetWindowWidth()
+{
+	return width;
+}
+
+float Window::GetWindowHeight()
+{
+	return height;
+}
+
 } // namespace Display
