@@ -1,3 +1,5 @@
+--Generates a map with rooms, corridors and doors and then writes it to a text-file 
+
 function Main()
   local localMainMap = {}
   
